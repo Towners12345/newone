@@ -1,0 +1,13 @@
+[project]
+name = "schedule-risk-analyser"
+version = "0.1.0"
+description = "AI-powered construction schedule risk analysis"
+requires-python = ">=3.11"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+
+[tool.ruff]
+line-length = 88
+target-version = "py312"

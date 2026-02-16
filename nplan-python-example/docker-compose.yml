@@ -1,0 +1,32 @@
+# Local development setup — run everything with one command:
+#   docker compose up --build
+#
+# This mirrors how nPlan's engineering team would run services locally.
+
+services:
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+      - DEBUG=true
+    volumes:
+      # Mount code for hot-reload during development
+      - ./app:/home/appuser/app
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # Run tests in a separate container
+  tests:
+    build: .
+    volumes:
+      - ./app:/home/appuser/app
+      - ./tests:/home/appuser/tests
+    command: pytest tests/ -v --tb=short
+    profiles:
+      - test  # Only runs with: docker compose --profile test run tests
